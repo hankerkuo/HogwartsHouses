@@ -3,7 +3,7 @@ import os
 import os.path as path
 
 # This function resize images (under the folder argument) to a custom size
-def resize_to_size(folder, width, height):
+def resize_to_somesize(folder, width, height):
     # mother_folder is the upper folder of folder
     mother_folder = path.abspath(folder + '/..')
 
@@ -21,4 +21,4 @@ def resize_to_size(folder, width, height):
         cv2.imwrite(path.join(folder_resized, images), img)
 
 filepath = 'C:/data/HogwartsHouses/gryffindor'
-resize_to_size(filepath, 100, 100)
+resize_to_somesize(filepath, 100, 100)
