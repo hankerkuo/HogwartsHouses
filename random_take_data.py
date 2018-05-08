@@ -3,7 +3,7 @@ import os.path as path
 import numpy as np
 import shutil
 
-# randomly take training data and testing data, and then put them in the folder of project!
+# randomly take training data and testing data, and then put them in the folder of this project!
 def random_take_data(mother_folder, train_num):
     # create folders
     if not path.exists('./train_data'):
