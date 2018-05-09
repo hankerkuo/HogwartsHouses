@@ -2,11 +2,12 @@ import numpy as np
 import os
 import os.path as path
 from six.moves import cPickle as pickle
-import imageio
 import cv2
 
+# image size, must be same as the values defined in 'step1_resize'
 image_width = 100
 image_height = 100
+
 
 def one_hot(y_value, num_class):
     # delicate index operation, y_value is a 1D array, num_class is the amount of class (i.e for MNIST, num_class = 10)
@@ -15,6 +16,8 @@ def one_hot(y_value, num_class):
     hot[np.arange(len(y_value)), y_value] = 1
     return hot
 
+
+# shuffle + label -> transfer into pickle file, folder is the train or test data folder
 def shuffle_and_label(folder):
     image_files = os.listdir(folder)
     np.random.shuffle(image_files)
@@ -42,4 +45,6 @@ def shuffle_and_label(folder):
     except Exception as e:
         print('Unable to save data to', path.join(folder, 'XX.pickle'), 'wb', ':', e)
 
+
 shuffle_and_label('./train_data')
+shuffle_and_label('./test_data')

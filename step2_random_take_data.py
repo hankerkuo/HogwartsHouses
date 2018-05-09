@@ -3,7 +3,9 @@ import os.path as path
 import numpy as np
 import shutil
 
+
 # randomly take training data and testing data, and then put them in the folder of this project!
+# mother_folder must contain all of the class folders
 def random_take_data(mother_folder, train_num):
     # create folders
     if not path.exists('./train_data'):
@@ -19,6 +21,7 @@ def random_take_data(mother_folder, train_num):
             shutil.copy(path.join(mother_folder, kid_folder, image), './train_data')
         for image in image_files_test:
             shutil.copy(path.join(mother_folder, kid_folder, image), './test_data')
+
 
 mother_folder = 'C:/data/HogwartsHouses/Final_data'
 random_take_data(mother_folder, 400)
