@@ -10,16 +10,16 @@ def resize_to_somesize(folder, width, height):
 
     # folder_Final is the new folder named 'Final_data', under the mother_folder
     # folder_resized is the new folder putting the resized images, os.path.basename() gives the recent folder name
-    folder_Final = path.join(mother_folder, 'Final_data')
-    folder_resized = path.join(folder_Final, path.basename(folder) + '_resized')
+    folder_final = path.join(mother_folder, 'Final_data')
+    folder_resized = path.join(folder_final, path.basename(folder) + '_resized')
 
     # load all the classes folder name
     classes_folder = os.listdir(folder)
 
     # create 'Final_data' folder
-    if not path.exists(folder_Final):
-        os.makedirs(folder_Final)
-        print('Successfully created', folder_Final)
+    if not path.exists(folder_final):
+        os.makedirs(folder_final)
+        print('Successfully created', folder_final)
 
     # create resized folders
     if not path.exists(folder_resized):
@@ -31,6 +31,7 @@ def resize_to_somesize(folder, width, height):
         img = cv2.resize(img, (width, height))
         cv2.imwrite(path.join(folder_resized, images), img)
     print('Successfully created', folder_resized)
+
 
 mother_folder = 'C:/data/HogwartsHouses'
 for folder in os.listdir(mother_folder):
