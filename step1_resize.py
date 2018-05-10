@@ -35,4 +35,4 @@ def resize_to_somesize(folder, width, height):
 
 mother_folder = 'C:/data/HogwartsHouses'
 for folder in os.listdir(mother_folder):
-    resize_to_somesize(path.join(mother_folder, folder), 50, 50)
+    resize_to_somesize(path.join(mother_folder, folder), 200, 200)

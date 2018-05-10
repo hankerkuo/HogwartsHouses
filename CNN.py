@@ -34,13 +34,13 @@ def max_pool_2x2(x):
 
 
 # image size
-image_width = np.int32(200)
-image_height = np.int32(200)
+image_width = 200
+image_height = 200
 
 # define the depth of each layer
-d_cnn1 = 4
-d_cnn2 = 8
-d_cnn3 = 16
+d_cnn1 = 8
+d_cnn2 = 16
+d_cnn3 = 32
 
 # define placeholder for inputs to network
 xs = tf.placeholder(tf.float32, [None, image_width, image_height, 3], name='x_input')   # image_width*image_height
