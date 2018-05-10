@@ -32,50 +32,38 @@ def max_pool_2x2(x):
     # ksize [Batch, Height, Width, Channel]
     return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
-
-# image size
-image_width = np.int32(200)
-image_height = np.int32(200)
+# define placeholder for inputs to network
+xs = tf.placeholder(tf.float32, [None, 100, 100], name='x_input')   # 100*100
+ys = tf.placeholder(tf.float32, [None, 4], name='y_input')
+keep_prob = tf.placeholder(tf.float32)
+x_image = tf.reshape(xs, [-1, 100, 100, 1])
+# print(x_image.shape)  # [n_samples, 100,100]
 
 # define the depth of each layer
 d_cnn1 = 4
-d_cnn2 = 8
-d_cnn3 = 16
+d_cnn2 = 4
 
-# define placeholder for inputs to network
-xs = tf.placeholder(tf.float32, [None, image_width, image_height, 3], name='x_input')   # image_width*image_height
-ys = tf.placeholder(tf.float32, [None, 4], name='y_input')
-keep_prob = tf.placeholder(tf.float32)
-x_image = tf.reshape(xs, [-1, image_width, image_height, 3])
-# print(x_image.shape)  # [n_samples, image_width, image_height, 3]
-
-# conv1 layer #
-W_conv1 = weight_variable([3, 3, 3, d_cnn1])  # patch 5x5, in size 3, out size 8
+## conv1 layer ##
+W_conv1 = weight_variable([5, 5, 1, d_cnn1])  # patch 5x5, in size 1, out size 8
 b_conv1 = bias_variable([d_cnn1])
 h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)  # output size 100x100x8
 h_pool1 = max_pool_2x2(h_conv1)                           # output size 50x50x8
 
-# conv2 layer #
-W_conv2 = weight_variable([3, 3, d_cnn1, d_cnn2])  # patch 5x5, in size 8, out size 16
+## conv2 layer ##
+W_conv2 = weight_variable([5, 5, d_cnn1, d_cnn2])  # patch 5x5, in size 8, out size 16
 b_conv2 = bias_variable([d_cnn2])
 h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)  # output size 50x50x16
 h_pool2 = max_pool_2x2(h_conv2)                           # output size 25x25x16
 
-# conv3 layer#
-W_conv3 = weight_variable([3, 3, d_cnn2, d_cnn3])
-b_conv3 = bias_variable([d_cnn3])
-h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3) + b_conv3)
-h_pool3 = max_pool_2x2(h_conv3)
-
-# fc1 layer #
-W_fc1 = weight_variable([np.int32((image_width / 8) * (image_height / 8) * d_cnn3), 1024])
+## fc1 layer ##
+W_fc1 = weight_variable([25*25*d_cnn2, 1024])
 b_fc1 = bias_variable([1024])
 # [n_samples, 25, 25, 16] ->> [n_samples, 25*25*16]
-h_pool3_flat = tf.reshape(h_pool3, [-1, np.int32((image_width / 8) * (image_height / 8) * d_cnn3)])
-h_fc1 = tf.nn.relu(tf.matmul(h_pool3_flat, W_fc1) + b_fc1)
+h_pool2_flat = tf.reshape(h_pool2, [-1, 25*25*d_cnn2])
+h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
-# fc2 layer #
+## fc2 layer ##
 W_fc2 = weight_variable([1024, 4])
 b_fc2 = bias_variable([4])
 prediction = tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
@@ -133,7 +121,7 @@ for epoch in range(300):       # epoch amount
     for batch in range(len(tr_dat) // batch_size):
         sess.run(train_step, feed_dict={xs: tr_dat[batch * batch_size: (batch + 1) * batch_size],
                                         ys: tr_lab[batch * batch_size: (batch + 1) * batch_size], keep_prob: 0.5})
-    if epoch % 1 == 0:
+    if epoch % 10 == 0:
         print(epoch, 'th', compute_accuracy(te_dat, te_lab))
 
 sess.close()
