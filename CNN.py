@@ -128,8 +128,8 @@ with open('./test_data/00_label.pickle', 'rb') as f:
 #     te_dat_after_gaussian_laplace[_, :, :] = ndimage.gaussian_laplace(te_dat[_, :, :], sigma=1)
 
 # training process starts
-batch_size = 200
-for epoch in range(300):       # epoch amount
+batch_size = 128
+for epoch in range(150):       # epoch amount
     for batch in range(len(tr_dat) // batch_size):
         sess.run(train_step, feed_dict={xs: tr_dat[batch * batch_size: (batch + 1) * batch_size],
                                         ys: tr_lab[batch * batch_size: (batch + 1) * batch_size], keep_prob: 0.5})

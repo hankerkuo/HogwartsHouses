@@ -13,10 +13,11 @@ with open('./test_data/00_data.pickle', 'rb') as f:
 with open('./test_data/00_label.pickle', 'rb') as f:
     te_lab = pickle.load(f)
 
+train_x, train_y, test_x, test_y = tr_dat, tr_lab, te_dat, te_lab
 # image = np.ndarray(shape=(600, 100, 100))
 # image_small = np.ndarray(shape=(100, 100, 3))
 # image[0] = (cv2.imread('./train_data/Gryffindor_004.jpg'))/255
-print(tr_dat[40])
+print(np.shape(test_x))
 # print(tr_lab[40])
-cv2.imshow('Houses', tr_dat[90])
-cv2.waitKey(0)
+# cv2.imshow('Houses', tr_dat[90])
+# cv2.waitKey(0)
