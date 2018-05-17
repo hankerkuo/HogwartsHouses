@@ -3,6 +3,7 @@ import os
 import os.path as path
 from six.moves import cPickle as pickle
 import cv2
+import json
 
 # image size, must be same as the values defined in 'step1_resize'
 image_width = 100
@@ -17,11 +18,42 @@ def one_hot(y_value, num_class):
     return hot
 
 
+# shuffle + label -> transfer into npy file, folder is the train or test data folder
+def npy_shuffle_and_label(folder, image_width, image_height):
+    image_files = os.listdir(folder)
+    np.random.shuffle(image_files)
+    # notice the shape here is (image_height, image_width)
+    data_set = np.ndarray(shape=(len(image_files), image_height, image_width, 3), dtype=np.float32)
+    label_set = np.ndarray(shape=(len(image_files)), dtype=np.int)
+    image_amount = 0
+
+    for image in image_files:
+        # strange part, when loading into 4d array, it automatically scales up, so need to divide 255
+        data_set[image_amount] = cv2.imread(path.join(folder, image)) / 255
+        # label the four houses in Hogwarts (R -> Ravenclaw, G -> Gryffindor, S -> Slytherin, H -> Hufflepuff)
+        if image[0] == 'R':
+            label_set[image_amount] = 0
+        elif image[0] == 'G':
+            label_set[image_amount] = 1
+        elif image[0] == 'S':
+            label_set[image_amount] = 2
+        elif image[0] == 'H':
+            label_set[image_amount] = 3
+        image_amount = image_amount + 1
+    label_set = one_hot(label_set, 4)
+
+    np.save(path.join(folder, '00_data.npy'), data_set)
+    print('successfully made npy:', path.join(folder, '00_data.npy'))
+    np.save(path.join(folder, '00_label.npy'), label_set)
+    print('successfully made npy:', path.join(folder, '00_label.npy'))
+
+
 # shuffle + label -> transfer into pickle file, folder is the train or test data folder
 def shuffle_and_label(folder, image_width, image_height):
     image_files = os.listdir(folder)
     np.random.shuffle(image_files)
-    data_set = np.ndarray(shape=(len(image_files), image_width, image_height, 3), dtype=np.float32)
+    # notice the shape here is (image_height, image_width)
+    data_set = np.ndarray(shape=(len(image_files), image_height, image_width, 3), dtype=np.float32)
     label_set = np.ndarray(shape=(len(image_files)), dtype=np.int)
     image_amount = 0
 
@@ -56,7 +88,7 @@ def shuffle_and_label(folder, image_width, image_height):
 def shuffle_and_label_grayscale(folder, image_width, image_height):
     image_files = os.listdir(folder)
     np.random.shuffle(image_files)
-    data_set = np.ndarray(shape=(len(image_files), image_width, image_height), dtype=np.float32)
+    data_set = np.ndarray(shape=(len(image_files), image_height, image_width), dtype=np.float32)
     label_set = np.ndarray(shape=(len(image_files)), dtype=np.int)
     image_amount = 0
     for image in image_files:
