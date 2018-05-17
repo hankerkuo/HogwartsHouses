@@ -34,8 +34,8 @@ def max_pool_2x2(x):
 
 
 # image size
-image_width = 200
-image_height = 200
+image_width = 224
+image_height = 224
 
 # define the depth of each layer
 d_cnn1 = 8
@@ -93,13 +93,14 @@ sess.run(init)
 # saver = tf.train.Saver()
 # saver.restore(sess, "my_net/save_net.ckpt")
 
-with open('./train_data/00_data.pickle', 'rb') as f:
+dataset_path = 'C:/data/HogwartsHouses/dataset_%dby%d' % (image_width, image_height)
+with open(dataset_path + '/train_data/00_data.pickle', 'rb') as f:
     tr_dat = pickle.load(f)
-with open('./train_data/00_label.pickle', 'rb') as f:
+with open(dataset_path + '/train_data/00_label.pickle', 'rb') as f:
     tr_lab = pickle.load(f)
-with open('./test_data/00_data.pickle', 'rb') as f:
+with open(dataset_path + '/test_data/00_data.pickle', 'rb') as f:
     te_dat = pickle.load(f)
-with open('./test_data/00_label.pickle', 'rb') as f:
+with open(dataset_path + '/test_data/00_label.pickle', 'rb') as f:
     te_lab = pickle.load(f)
 
 # # building ndarrays for storing results after filters
@@ -128,12 +129,12 @@ with open('./test_data/00_label.pickle', 'rb') as f:
 #     te_dat_after_gaussian_laplace[_, :, :] = ndimage.gaussian_laplace(te_dat[_, :, :], sigma=1)
 
 # training process starts
-batch_size = 128
-for epoch in range(150):       # epoch amount
+batch_size = 256
+for epoch in range(1500):       # epoch amount
     for batch in range(len(tr_dat) // batch_size):
         sess.run(train_step, feed_dict={xs: tr_dat[batch * batch_size: (batch + 1) * batch_size],
                                         ys: tr_lab[batch * batch_size: (batch + 1) * batch_size], keep_prob: 0.5})
-    if epoch % 1 == 0:
+    if epoch % 10 == 0:
         print(epoch, 'th', compute_accuracy(te_dat, te_lab))
 
 sess.close()

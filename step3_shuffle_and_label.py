@@ -5,8 +5,8 @@ from six.moves import cPickle as pickle
 import cv2
 
 # image size, must be same as the values defined in 'step1_resize'
-image_width = 200
-image_height = 200
+image_width = 100
+image_height = 100
 
 
 def one_hot(y_value, num_class):
@@ -18,7 +18,7 @@ def one_hot(y_value, num_class):
 
 
 # shuffle + label -> transfer into pickle file, folder is the train or test data folder
-def shuffle_and_label(folder):
+def shuffle_and_label(folder, image_width, image_height):
     image_files = os.listdir(folder)
     np.random.shuffle(image_files)
     data_set = np.ndarray(shape=(len(image_files), image_width, image_height, 3), dtype=np.float32)
@@ -53,7 +53,7 @@ def shuffle_and_label(folder):
 
 # shuffle + label -> transfer into pickle file, folder is the train or test data folder
 # gray-scale version
-def shuffle_and_label_grayscale(folder):
+def shuffle_and_label_grayscale(folder, image_width, image_height):
     image_files = os.listdir(folder)
     np.random.shuffle(image_files)
     data_set = np.ndarray(shape=(len(image_files), image_width, image_height), dtype=np.float32)
@@ -97,8 +97,11 @@ def delete_old_pickle(folder):
     except Exception as e:
         print('Unable to delete file', path.join(folder, '00_label.pickle'), 'error : ', e)
 
-
-delete_old_pickle('./train_data')
-delete_old_pickle('./test_data')
-shuffle_and_label('./train_data')
-shuffle_and_label('./test_data')
+# sample code of using this lib
+'''
+data_set_folder = 'C:/data/HogwartsHouses/dataset_32by32'
+delete_old_pickle(data_set_folder + '/train_data')
+delete_old_pickle(data_set_folder + '/test_data')
+shuffle_and_label(data_set_folder + '/train_data', 32, 32)
+shuffle_and_label(data_set_folder + '/test_data', 32, 32)
+'''
