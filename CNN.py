@@ -34,8 +34,8 @@ def max_pool_2x2(x):
 
 
 # image size
-image_width = 224
-image_height = 224
+image_width = 200
+image_height = 200
 
 # define the depth of each layer
 d_cnn1 = 8
@@ -93,7 +93,8 @@ sess.run(init)
 # saver = tf.train.Saver()
 # saver.restore(sess, "my_net/save_net.ckpt")
 
-dataset_path = 'C:/data/HogwartsHouses/dataset_%dby%d' % (image_width, image_height)
+# dataset_path = 'C:/data/HogwartsHouses/dataset_%dby%d' % (image_width, image_height)
+dataset_path = '.'
 with open(dataset_path + '/train_data/00_data.pickle', 'rb') as f:
     tr_dat = pickle.load(f)
 with open(dataset_path + '/train_data/00_label.pickle', 'rb') as f:
@@ -135,7 +136,8 @@ for epoch in range(1500):       # epoch amount
         sess.run(train_step, feed_dict={xs: tr_dat[batch * batch_size: (batch + 1) * batch_size],
                                         ys: tr_lab[batch * batch_size: (batch + 1) * batch_size], keep_prob: 0.5})
     if epoch % 10 == 0:
-        print(epoch, 'th', compute_accuracy(te_dat, te_lab))
+        print(epoch, 'th test accuracy = ', compute_accuracy(te_dat, te_lab), end=' ')
+        print('train loss = ', sess.run(cross_entropy, feed_dict={xs: tr_dat, ys: tr_lab, keep_prob: 0.5}))
 
 sess.close()
 
