@@ -180,10 +180,10 @@ def dropout(x, keep_prob):
 
 def compute_accuracy(v_xs, v_ys):
     global prediction
-    y_pre = sess.run(prediction, feed_dict={xs: v_xs})
+    y_pre = sess.run(prediction, feed_dict={xs: v_xs, kp_prob: 1})
     correct_prediction = tf.equal(tf.argmax(y_pre, 1), tf.argmax(v_ys, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-    result = sess.run(accuracy, feed_dict={xs: v_xs, ys: v_ys})
+    result = sess.run(accuracy, feed_dict={xs: v_xs, ys: v_ys, kp_prob: 1})
     return result
 
 # image size
@@ -193,10 +193,11 @@ image_height = 227
 # define placeholder for inputs to network
 xs = tf.placeholder(tf.float32, [None, image_width, image_height, 3], name='x_input')   # image_width*image_height
 ys = tf.placeholder(tf.float32, [None, 4], name='y_input')
+kp_prob = tf.placeholder(tf.float32)
 x_image = tf.reshape(xs, [-1, image_width, image_height, 3])
 
 #####################
-prediction = tf.nn.softmax(AlexNet(xs, 0.5, 4).fc8)
+prediction = tf.nn.softmax(AlexNet(xs, kp_prob, 4).fc8)
 
 # the error between prediction and real data, two kinds of cost function
 cross_entropy = tf.reduce_mean(-tf.reduce_sum(ys * tf.log(prediction),
@@ -222,13 +223,22 @@ with open(dataset_path + '/test_data/00_label.pickle', 'rb') as f:
     te_lab = pickle.load(f)
 
 # training process starts
-batch_size = 256
+batch_size = 128
 for epoch in range(1500):       # epoch amount
     for batch in range(len(tr_dat) // batch_size):
-        sess.run(train_step, feed_dict={xs: tr_dat[batch * batch_size: (batch + 1) * batch_size],
-                                        ys: tr_lab[batch * batch_size: (batch + 1) * batch_size]})
+        train_op, loss = sess.run([train_step, cross_entropy], feed_dict={
+                                        xs: tr_dat[batch * batch_size: (batch + 1) * batch_size],
+                                        ys: tr_lab[batch * batch_size: (batch + 1) * batch_size], kp_prob: 0.5})
+        # incremental average (refresh average loss after every epoch)
+        try:
+            average_loss += 1 / (batch + 1) * (loss - average_loss)
+        except:
+            average_loss = 0
     if epoch % 1 == 0:
-        print(epoch, 'th', compute_accuracy(te_dat, te_lab))
+        print(epoch, 'th test accuracy = %.3f' % compute_accuracy(te_dat, te_lab), end=' ')
+        # print('train accuracy = %.3f' % compute_accuracy(tr_dat, tr_lab), end=' ')
+        print('(loss = %.4f)' % average_loss)
+    average_loss = 0
 
 sess.close()
 

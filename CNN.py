@@ -34,8 +34,8 @@ def max_pool_2x2(x):
 
 
 # image size
-image_width = 200
-image_height = 200
+image_width = 32
+image_height = 32
 
 # define the depth of each layer
 d_cnn1 = 8
@@ -93,8 +93,8 @@ sess.run(init)
 # saver = tf.train.Saver()
 # saver.restore(sess, "my_net/save_net.ckpt")
 
-# dataset_path = 'C:/data/HogwartsHouses/dataset_%dby%d' % (image_width, image_height)
-dataset_path = '.'
+dataset_path = 'C:/data/HogwartsHouses/dataset_%dby%d' % (image_width, image_height)
+# dataset_path = '.'
 with open(dataset_path + '/train_data/00_data.pickle', 'rb') as f:
     tr_dat = pickle.load(f)
 with open(dataset_path + '/train_data/00_label.pickle', 'rb') as f:
@@ -130,14 +130,21 @@ with open(dataset_path + '/test_data/00_label.pickle', 'rb') as f:
 #     te_dat_after_gaussian_laplace[_, :, :] = ndimage.gaussian_laplace(te_dat[_, :, :], sigma=1)
 
 # training process starts
-batch_size = 256
+batch_size = 128
 for epoch in range(1500):       # epoch amount
     for batch in range(len(tr_dat) // batch_size):
-        sess.run(train_step, feed_dict={xs: tr_dat[batch * batch_size: (batch + 1) * batch_size],
+        train_op, loss = sess.run([train_step, cross_entropy], feed_dict={
+                                        xs: tr_dat[batch * batch_size: (batch + 1) * batch_size],
                                         ys: tr_lab[batch * batch_size: (batch + 1) * batch_size], keep_prob: 0.5})
+        # incremental average (refresh average loss after each epoch)
+        try:
+            average_loss += 1 / (batch + 1) * (loss - average_loss)
+        except:
+            average_loss = 0
     if epoch % 10 == 0:
-        print(epoch, 'th test accuracy = ', compute_accuracy(te_dat, te_lab), end=' ')
-        print('train loss = ', sess.run(cross_entropy, feed_dict={xs: tr_dat, ys: tr_lab, keep_prob: 0.5}))
+        print(epoch, 'th test accuracy = %.3f' % compute_accuracy(te_dat, te_lab), end=' ')
+        print('train accuracy = %.3f' % compute_accuracy(tr_dat, tr_lab), '(loss = %.4f)' % average_loss)
+    average_loss = 0
 
 sess.close()
 
