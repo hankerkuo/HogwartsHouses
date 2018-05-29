@@ -104,6 +104,7 @@ with open(dataset_path + '/test_data/00_data.pickle', 'rb') as f:
 with open(dataset_path + '/test_data/00_label.pickle', 'rb') as f:
     te_lab = pickle.load(f)
 
+
 # # building ndarrays for storing results after filters
 # tr_dat_after_sobel = np.ndarray(shape=(np.shape(tr_dat)), dtype=np.float32)
 # tr_dat_after_prewitt = np.ndarray(shape=(np.shape(tr_dat)), dtype=np.float32)
